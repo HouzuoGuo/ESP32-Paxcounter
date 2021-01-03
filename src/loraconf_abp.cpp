@@ -54,7 +54,7 @@ void setABPParameters() {
     LMIC.dn2Dr = DR_SF9;
 
     // Set data rate and transmit power for uplink
-    LMIC_setDrTxpow(DR_SF7,14);
+    LMIC_setDrTxpow(DR_SF10,20);
 }
 
 #endif
