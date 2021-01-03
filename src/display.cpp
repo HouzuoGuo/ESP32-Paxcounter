@@ -260,33 +260,37 @@ void dp_drawPage(time_t t, bool nextpage) {
     // WIFI:abcde BLTH:abcde
 
 #if ((WIFICOUNTER) && (BLECOUNTER))
-    if (cfg.wifiscan)
-      dp_printf("WIFI:%-5d", macs_wifi);
+    if (cfg.wifiscan) {
+      dp_printf("WiFi:%-3d", macs_wifi);
+      dp_printf(" Ch:%-2d", channel);
+    }
     else
-      dp_printf("WIFI:off");
+      dp_printf("WiFi:off");
     if (cfg.blescan)
 #if (COUNT_ENS)
       if (cfg.enscount)
-        dp_printf(" CWA:%-5d", cwa_report());
+        dp_printf(" CWA:%-3d", cwa_report());
       else
 #endif
-        dp_printf("BLTH:%-5d", macs_ble);
+        dp_printf(" BT:%-3d", macs_ble);
     else
-      dp_printf(" BLTH:off");
+      dp_printf(" BT:off");
 #elif ((WIFICOUNTER) && (!BLECOUNTER))
-    if (cfg.wifiscan)
-      dp_printf("WIFI:%-5d", macs_wifi);
+    if (cfg.wifiscan) {
+      dp_printf("WiFi:%-3d", macs_wifi);
+      dp_printf(" ch:%-2d", channel);
+    }
     else
-      dp_printf("WIFI:off");
+      dp_printf("WiFi:off");
 #elif ((!WIFICOUNTER) && (BLECOUNTER))
     if (cfg.blescan)
-      dp_printf("BLTH:%-5d", macs_ble);
+      dp_printf(" BT:%-3d", macs_ble);
 #if (COUNT_ENS)
     if (cfg.enscount)
       dp_printf("(CWA:%d)", cwa_report());
     else
 #endif
-      dp_printf("BLTH:off");
+      dp_printf("BT:off");
 #else
     dp_printf("Sniffer disabled");
 #endif
@@ -296,28 +300,27 @@ void dp_drawPage(time_t t, bool nextpage) {
     // B:a.bcV Sats:ab ch:ab
 #if (defined BAT_MEASURE_ADC || defined HAS_PMU || defined HAS_IP5306)
     if (batt_level == 0)
-      dp_printf("No batt ");
+      dp_printf("No batt");
     else
-      dp_printf("B:%3d%%  ", batt_level);
+      dp_printf("Bat:%3d%%", batt_level);
 #else
     dp_printf("       ");
 #endif
 
 #if (HAS_GPS)
     dp_setFont(MY_FONT_SMALL, !gps_hasfix());
-    dp_printf("Sats:%.2d", gps.satellites.value());
+    dp_printf(" Sats:%.2d", gps.satellites.value());
     dp_setFont(MY_FONT_SMALL);
 #else
     dp_printf("       ");
 #endif
-    dp_printf(" ch:%02d", channel);
     // dp_printf(" due:%02d", rf_load);
     dp_println();
 
     // line 5: RSSI limiter + free memory
     // RLIM:abcd  Mem:abcdKB
     dp_printf(!cfg.rssilimit ? "RLIM:off " : "RLIM:%-4d", cfg.rssilimit);
-    dp_printf("  Mem:%4dKB", getFreeRAM() / 1024);
+    dp_printf(" Mem:%4dKB", getFreeRAM() / 1024);
     dp_println();
 
     // line 6: time + date
@@ -367,13 +370,13 @@ void dp_drawPage(time_t t, bool nextpage) {
 
     dp_setFont(MY_FONT_SMALL);
     dp_setTextCursor(0, 3);
-    dp_printf("Net:%06X   Pwr:%-2d", LMIC.netid & 0x001FFFFF, LMIC.radio_txpow);
+    dp_printf("NetID:%06X Pwr:%-2d", LMIC.netid & 0x001FFFFF, LMIC.radio_txpow);
     dp_println();
-    dp_printf("Dev:%08X DR:%1d", LMIC.devaddr, LMIC.datarate);
+    dp_printf("DevAddr:%08X DR:%1d", LMIC.devaddr, LMIC.datarate);
     dp_println();
-    dp_printf("ChMsk:%04X Nonce:%04X", LMIC.channelMap, LMIC.devNonce);
+    dp_printf("Chan:%04X Nonce:%04X", LMIC.channelMap, LMIC.devNonce);
     dp_println();
-    dp_printf("fUp:%-6d fDn:%-6d", LMIC.seqnoUp ? LMIC.seqnoUp - 1 : 0,
+    dp_printf("#Up:%-6d #Dn:%-6d", LMIC.seqnoUp ? LMIC.seqnoUp - 1 : 0,
               LMIC.seqnoDn ? LMIC.seqnoDn - 1 : 0);
     dp_println();
     dp_printf("SNR:%-5d  RSSI:%-5d", (LMIC.snr + 2) / 4, LMIC.rssi);
@@ -386,27 +389,46 @@ void dp_drawPage(time_t t, bool nextpage) {
   case 2:
 
 #if (HAS_GPS)
-    dp_setFont(MY_FONT_STRETCHED);
+    dp_setFont(MY_FONT_SMALL);
     dp_setTextCursor(0, 3);
     if (gps_hasfix()) {
-      // line 5: clear "No fix"
       if (wasnofix) {
-        dp_setTextCursor(2, 4);
-        dp_printf("      ");
+        // line 3: clear "No fix"
+        dp_setTextCursor(0, 3);
+        dp_printf("                      ");
         wasnofix = false;
       }
-      // line 3-4: GPS latitude
-      dp_printf("%c%07.4f", gps.location.rawLat().negative ? 'S' : 'N',
-                gps.location.lat());
-
-      // line 6-7: GPS longitude
-      dp_printf("%c%07.4f", gps.location.rawLng().negative ? 'W' : 'E',
-                gps.location.lng());
-
+      // line 3: GPS latitude
+      double lat_d, lat_m, lat_s, throw_away;
+      lat_m = modf(gps.location.lat(), &lat_d) * 60;
+      lat_s = modf(lat_m, &throw_away) * 60;
+      dp_setTextCursor(0, 3);
+      dp_printf("                      ");
+      dp_setTextCursor(0, 3);
+      dp_printf("Lat: %c %dd %dm %ds", gps.location.rawLat().negative ? 'S' : 'N', (int)lat_d, (int)lat_m, (int)lat_s);
+      // line 4: GPS longitude
+      double lon_d, lon_m, lon_s;
+      lon_m = modf(gps.location.lng(), &lon_d) * 60;
+      lon_s = modf(lon_m, &throw_away) * 60;
+      dp_setTextCursor(0, 4);
+      dp_printf("                      ");
+      dp_setTextCursor(0, 4);
+      dp_printf("Lon: %c %dd %dm %ds", gps.location.rawLng().negative ? 'W' : 'E', (int)lon_d, (int)lon_m, (int)lon_s);
+      // line 5: GPS altitude
+      dp_setTextCursor(0, 5);
+      dp_printf("                      ");
+      dp_setTextCursor(0, 5);
+      dp_printf("Altitude: %.1fm", gps.altitude.feet() / 3.2808);
+      // line 6: GPS date and time
+      dp_setTextCursor(0, 6);
+      dp_printf("                      ");
+      dp_setTextCursor(0, 6);
+      dp_printf("%d-%02d-%02d %02d:%02d:%02dZ", gps.date.year(), gps.date.month(), gps.date.day(), gps.time.hour(), gps.time.minute(), gps.time.second());
     } else {
-      dp_setTextCursor(2, 4);
-      dp_setFont(MY_FONT_STRETCHED, 1);
-      dp_printf("No fix");
+      // line 3: indication of missing GPS location fix
+      dp_setTextCursor(0, 3);
+      dp_setFont(MY_FONT_SMALL, 1);
+      dp_printf("No GPS fix");
       wasnofix = true;
     }
     break;
