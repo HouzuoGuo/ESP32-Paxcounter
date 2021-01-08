@@ -7,6 +7,8 @@
 // Local logging tag
 static const char TAG[] = __FILE__;
 
+static int consecutive_macs_counter_zero = 0;
+
 Ticker cyclicTimer;
 
 #if (HAS_SDS011)
@@ -91,6 +93,21 @@ void doHousekeeping() {
            bme_status.pressure);
 #endif
 #endif
+
+  // On TTGO T-Beam v0.7, the pax counter (wifi+ble) often reads 0 after a short short while.
+  // The cause is yet to be determined. As a temporary measure, count the consecutive readings of counter value 0.
+  // If there are 10 consecutive readings of 0 within timespan of 5 minutes, then reset the microcontroller.
+  ESP_LOGI(TAG, "WiFi macs counter: %d; BLE macs counter: %d", macs_wifi, macs_ble);
+  if (macs_wifi == 0 && macs_ble == 0) {
+    ++consecutive_macs_counter_zero;
+    ESP_LOGI(TAG, "number of consecutive zero readings on the mac counter: %d", consecutive_macs_counter_zero);
+    if (consecutive_macs_counter_zero >= 300 / HOMECYCLE) {
+      ESP_LOGE(TAG, "too many consecutive zero reading on the mac counter, resetting microcontroller.");
+      do_reset(true);
+    }
+  } else {
+    consecutive_macs_counter_zero = 0;
+  }
 
   // check free heap memory
   if (ESP.getMinFreeHeap() <= MEM_LOW) {
