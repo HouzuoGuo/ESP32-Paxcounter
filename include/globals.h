@@ -30,6 +30,7 @@
 #define SENSOR2_DATA _bit(5)
 #define SENSOR3_DATA _bit(6)
 #define BATT_DATA _bit(7)
+#define END_OF_PAYLOAD_TYPES _bit(8)
 
 // length of display buffer for lmic event messages
 #define LMIC_EVENTMSG_LEN 17
