@@ -500,6 +500,7 @@ void setup() {
 #endif // HAS_BUTTON
 
   // cyclic function interrupts
+  ESP_LOGI(TAG, "Payload transmission routine will run every %d seconds, and house keeping routine will run every %d seconds.", cfg.sendcycle, HOMECYCLE);
   sendTimer.attach(cfg.sendcycle * 2, setSendIRQ);
   cyclicTimer.attach(HOMECYCLE, setCyclicIRQ);
 

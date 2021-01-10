@@ -104,6 +104,9 @@ bool loadConfig() {
     ESP_LOGI(TAG, "NVRAM initialized, device starts with factory settings");
     eraseConfig();
   }
+  // Always erase persisted configuration for development activities
+  eraseConfig();
+  return true;
 
   // simple check that runtime config data matches
   // if (nvram.getBytesLength(DEVCONFIG) != (cfgLen + cfgLen2)) {
