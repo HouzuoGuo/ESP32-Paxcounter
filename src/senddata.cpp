@@ -81,11 +81,13 @@ void sendData() {
 #endif
 
   while (bitmask) {
+    ESP_LOGD(TAG, "bitmask: %d mask: %d and: %d", bitmask, mask, bitmask & mask);
     switch (bitmask & mask) {
 
 #if ((WIFICOUNTER) || (BLECOUNTER))
     case COUNT_DATA:
       payload.reset();
+      ESP_LOGI(TAG, "Sending PAX counter data (WiFi: %d, BLE: %d)", macs_wifi, macs_ble);
 #if !(PAYLOAD_OPENSENSEBOX)
       payload.addCount(macs_wifi, MAC_SNIFF_WIFI);
       if (cfg.blescan)
@@ -95,6 +97,7 @@ void sendData() {
       if (GPSPORT == COUNTERPORT) {
         // send GPS position only if we have a fix
         if (gps_hasfix()) {
+          ESP_LOGI(TAG, "Sending GPS data along with PAX counter");
           gps_storelocation(&gps_status);
           payload.addGPS(gps_status);
         } else
@@ -125,6 +128,7 @@ void sendData() {
 
 #if (HAS_BME)
     case MEMS_DATA:
+      ESP_LOGI(TAG, "Sending BME environment sensor data");
       payload.reset();
       payload.addBME(bme_status);
       SendPayload(BMEPORT);
@@ -136,6 +140,7 @@ void sendData() {
       if (GPSPORT != COUNTERPORT) {
         // send GPS position only if we have a fix
         if (gps_hasfix()) {
+          ESP_LOGI(TAG, "Sending GPS data");
           gps_storelocation(&gps_status);
           payload.reset();
           payload.addGPS(gps_status);
@@ -149,6 +154,7 @@ void sendData() {
 #if (HAS_SENSORS)
 #if (HAS_SENSOR_1)
     case SENSOR1_DATA:
+      ESP_LOGI(TAG, "Sending data from sensor 1");
       payload.reset();
       payload.addSensor(sensor_read(1));
       SendPayload(SENSOR1PORT);
@@ -160,6 +166,7 @@ void sendData() {
 #endif
 #if (HAS_SENSOR_2)
     case SENSOR2_DATA:
+      ESP_LOGI(TAG, "Sending data from sensor 2");
       payload.reset();
       payload.addSensor(sensor_read(2));
       SendPayload(SENSOR2PORT);
@@ -167,6 +174,7 @@ void sendData() {
 #endif
 #if (HAS_SENSOR_3)
     case SENSOR3_DATA:
+      ESP_LOGI(TAG, "Sending data from sensor 3");
       payload.reset();
       payload.addSensor(sensor_read(3));
       SendPayload(SENSOR3PORT);
@@ -176,8 +184,10 @@ void sendData() {
 
 #if (defined BAT_MEASURE_ADC || defined HAS_PMU)
     case BATT_DATA:
+      uint16_t volt_data = read_voltage();
+      ESP_LOGI(TAG, "Sending battery voltage data - %d", volt_data);
       payload.reset();
-      payload.addVoltage(read_voltage());
+      payload.addVoltage(volt_data);
       SendPayload(BATTPORT);
       break;
 #endif
