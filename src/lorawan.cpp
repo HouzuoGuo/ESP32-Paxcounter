@@ -52,9 +52,7 @@ static const lmic_pinmap myPinmap = {
     .pConfig = &myHalConfig};
 
 void lora_setupForNetwork(bool preJoin) {
-
   if (preJoin) {
-
 #if CFG_LMIC_US_like
     // in the US, with TTN, it saves join time if we start on subband 1
     // (channels 8-15). This will get overridden after the join by
@@ -68,11 +66,10 @@ void lora_setupForNetwork(bool preJoin) {
 #endif
 
   } else {
-    // set data rate adaptation according to saved setting
-    LMIC_setAdrMode(cfg.adrmode);
-    // set data rate and transmit power to stored device values if no ADR
-    if (!cfg.adrmode)
-      LMIC_setDrTxpow(assertDR(cfg.loradr), cfg.txpower);
+    // Conserve airtime by removing link checking after having successfully joined TTN
+    LMIC_setLinkCheckMode(false);
+    LMIC_setAdrMode(false);
+    LMIC_setDrTxpow(DR_SF10, cfg.txpower);
     // show current devaddr
     ESP_LOGI(TAG, "DEVaddr: 0x%08X | Network ID: 0x%06X | Network Type: %d",
              LMIC.devaddr, LMIC.netid & 0x001FFFFF, LMIC.netid & 0x00E00000);
