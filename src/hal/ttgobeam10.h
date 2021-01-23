@@ -20,7 +20,7 @@ User, long press    -> send a button message
 Reset -> reset device
 */
 
-//#define HAS_DISPLAY 1
+#define HAS_DISPLAY 1
 #define MY_DISPLAY_SDA SDA
 #define MY_DISPLAY_SCL SCL
 #define MY_DISPLAY_RST NOT_A_PIN
@@ -55,7 +55,9 @@ Reset -> reset device
 
 // enable only if device has these sensors, otherwise comment these lines
 // BME680 sensor on I2C bus
-//#define HAS_BME 1 // Enable BME sensors in general
+#define HAS_BME 1 // Enable BME sensors in general
+#define HAS_BME280 GPIO_NUM_21, GPIO_NUM_22 // SDA, SCL
+#define BME280_ADDR 0x76 // change to 0x77 depending on your wiring
 //#define HAS_BME680 SDA, SCL
 //#define BME680_ADDR BME680_I2C_ADDR_PRIMARY // !! connect SDIO of BME680 to GND !!
 
