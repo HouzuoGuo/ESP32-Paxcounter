@@ -175,7 +175,7 @@ void gps_loop(void *pvParameters) {
     //         gps.passedChecksum(), gps.failedChecksum(),
     //         gps.sentencesWithFix());
 
-    delay(2); // yield to CPU
+    delay(1000); // yield to CPU
 
   } // end of infinite loop
 
