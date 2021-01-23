@@ -11,6 +11,3 @@
 .clang_complete
 .gcc-flags.json
 src/loraconf.h
-src/ota.conf
-platformio.ini
-src/paxcounter.conf
