@@ -440,7 +440,7 @@ void dp_drawPage(time_t t, bool nextpage) {
   case 3:
 
 #if (HAS_BME)
-    dp_setFont(MY_FONT_STRETCHED);
+    dp_setFont(MY_FONT_NORMAL);
     dp_setTextCursor(0, 2);
 
     // line 2-3: Temp
@@ -466,7 +466,7 @@ void dp_drawPage(time_t t, bool nextpage) {
   // ---------- page 4: time ----------
   case 4:
 
-    dp_setFont(MY_FONT_LARGE);
+    dp_setFont(MY_FONT_NORMAL);
     dp_setTextCursor(0, 4);
     dp_printf("%02d:%02d:%02d", hour(t), minute(t), second(t));
     break;
