@@ -35,7 +35,7 @@ Reset -> reset device
 // power management settings
 #define HAS_PMU 1 // has AXP192 chip
 #define PMU_INT GPIO_NUM_35 // battery interrupt
-#define PMU_CHG_CURRENT AXP1XX_CHARGE_CUR_1000MA // battery charge current
+#define PMU_CHG_CURRENT AXP1XX_CHARGE_CUR_700MA // battery charge current
 // possible values (mA):
 // 100/190/280/360/450/550/630/700/780/880/960/1000/1080/1160/1240/1320
 #define PMU_CHG_CUTOFF AXP202_TARGET_VOL_4_2V // battery charge cutoff
