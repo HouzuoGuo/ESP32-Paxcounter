@@ -142,7 +142,8 @@ void bme_storedata(bmeStatus_t *bme_store) {
       updateState();
     }
 #elif defined HAS_BME280
-    bme_store->temperature = bme.readTemperature();
+    // Howard's addition - on TTGO T-Beam v1.1, the temperature reading appears to be higher by 7 degrees Celcius, therefore substract the offset.
+    bme_store->temperature = bme.readTemperature() - 7.0;
     bme_store->pressure = (bme.readPressure() / 100.0); // conversion Pa -> hPa
     // bme.readAltitude(SEALEVELPRESSURE_HPA);
     bme_store->humidity = bme.readHumidity();
