@@ -38,7 +38,7 @@ Reset -> reset device
 #define PMU_CHG_CURRENT AXP1XX_CHARGE_CUR_700MA // battery charge current
 // possible values (mA):
 // 100/190/280/360/450/550/630/700/780/880/960/1000/1080/1160/1240/1320
-#define PMU_CHG_CUTOFF AXP202_TARGET_VOL_4_2V // battery charge cutoff
+#define PMU_CHG_CUTOFF AXP202_TARGET_VOL_4_15V // battery charge cutoff
 // possible values (V):
 // 4_1/4_15/4_2/4_36
 
